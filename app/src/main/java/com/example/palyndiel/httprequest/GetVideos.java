@@ -42,8 +42,8 @@ public class GetVideos extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
         try {
 
-            //final TextView outputView = (TextView) findViewById(R.id.showOutput);
-            URL url = new URL("http://192.168.1.17:4040/rest/getVideos.view");
+            final TextView outputView = (TextView) activity.findViewById(R.id.showOutput);
+            URL url = new URL("http://192.168.0.19:4040/rest/getVideos.view");
 
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
             String urlParameters = "u=admin&p=admin&v=1.12.0&c=myapp";
@@ -80,7 +80,7 @@ public class GetVideos extends AsyncTask<String, Void, Void> {
 
                 @Override
                 public void run() {
-                    //outputView.setText(output);
+                    outputView.setText(output);
                     progress.dismiss();
                 }
             });

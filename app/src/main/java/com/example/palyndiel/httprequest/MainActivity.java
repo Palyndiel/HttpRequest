@@ -1,114 +1,85 @@
 package com.example.palyndiel.httprequest;
 
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ProgressDialog progress;
+    private List<Video> mListItems;
+    private VideoAdapter mAdapter;
+    private TextView mSelectedTrackTitle;
+    private String output;
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
-    public void sendPostRequest(View View) {
-        new GetVideos(this, MainActivity.this).execute();
-    }
-
-    /*private class GetVideoClass extends AsyncTask<String, Void, Void> {
-
-        private final Context context;
-
-        public GetVideoClass(Context c){
-
-            this.context = c;
-//            this.error = status;
-//            this.type = t;
+        mListItems = new ArrayList<Video>();
+        try {
+            sendPostRequest("getVideos", 0);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        protected void onPreExecute(){
-            progress= new ProgressDialog(this.context);
-            progress.setMessage("Loading");
-            progress.show();
+        try {
+            mListItems = new XMLParser().Parser(output);
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        ListView listView = (ListView)findViewById(R.id.video_list_view);
+        mAdapter = new VideoAdapter(this, mListItems);
+        listView.setAdapter(mAdapter);
 
-        @Override
-        protected Void doInBackground(String... params) {
-            try {
+        mSelectedTrackTitle = (TextView)findViewById(R.id.selected_video_title);
 
-                final TextView outputView = (TextView) findViewById(R.id.showOutput);
-                URL url = new URL("http://192.168.1.17:4040/rest/getVideos.view");
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Video video = mListItems.get(position);
+                int num = video.getID();
 
-                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                String urlParameters = "u=admin&p=admin&v=1.12.0&c=myapp";
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("USER-AGENT", "Mozilla/5.0");
-                connection.setRequestProperty("ACCEPT-LANGUAGE", "en-US,en;0.5");
-                connection.setDoOutput(true);
-                DataOutputStream dStream = new DataOutputStream(connection.getOutputStream());
-                dStream.writeBytes(urlParameters);
-                dStream.flush();
-                dStream.close();
-                int responseCode = connection.getResponseCode();
+                String req = "http://192.168.0.19:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id="+num;
 
-                System.out.println("\nSending 'POST' request to URL : " + url);
-                System.out.println("Post parameters : " + urlParameters);
-                System.out.println("Response Code : " + responseCode);
+                /*mSelectedTrackTitle.setText(req);
+                Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
+                myIntent.putExtra("request", req);
+                startActivity(myIntent);*/
+                Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
+                myIntent.setData(Uri.parse(req));
+                startService(myIntent);
 
-                final StringBuilder output = new StringBuilder("Request URL " + url);
-                output.append(System.getProperty("line.separator") + "Request Parameters " + urlParameters);
-                output.append(System.getProperty("line.separator")  + "Response Code " + responseCode);
-                output.append(System.getProperty("line.separator")  + "Type " + "POST");
-                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String line = "";
-                StringBuilder responseOutput = new StringBuilder();
-                System.out.println("output===============" + br);
-                while((line = br.readLine()) != null ) {
-                    responseOutput.append(line);
-                }
-                br.close();
-
-                output.append(System.getProperty("line.separator") + "Response " + System.getProperty("line.separator") + System.getProperty("line.separator") + responseOutput.toString());
-
-                MainActivity.this.runOnUiThread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        outputView.setText(output);
-                        progress.dismiss();
-                    }
-                });
-
-
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
-            return null;
-        }
+        });
+    }
 
-        protected void onPostExecute() {
-            progress.dismiss();
-        }
-
-    }*/
+    public void sendPostRequest(String req, int num) throws ExecutionException, InterruptedException {
+        output = new GetVideos(this, MainActivity.this, req, 0).execute().get();
+        //Toast.makeText(MainActivity.this, output, Toast.LENGTH_LONG).show();
+        //mSelectedTrackTitle.setText(output);
+    }
 
 }

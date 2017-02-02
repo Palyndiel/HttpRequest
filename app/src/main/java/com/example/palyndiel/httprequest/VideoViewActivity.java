@@ -19,21 +19,20 @@ public class VideoViewActivity extends Activity{
     VideoView videoview;
 
     // Insert your Video URL
-    //Bundle extras = getIntent().getExtras();
-    Intent extras = getIntent();
 
     //String VideoURL = extras.getString("request");
-    String VideoURL = "http://192.168.0.19:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id=2";
+    String VideoURL = "http://192.168.1.17:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        VideoURL += extras.getString("id");
         // Get the layout from video_main.xml
         setContentView(R.layout.videoview_main);
         // Find your VideoView in your video_main.xml layout
         videoview = (VideoView) findViewById(R.id.VideoView);
         // Execute StreamVideo AsyncTask
-
         // Create a progressbar
         pDialog = new ProgressDialog(VideoViewActivity.this);
         // Set progressbar title

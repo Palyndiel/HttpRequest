@@ -42,7 +42,7 @@ public class GetVideos extends AsyncTask<String, Void, String> {
     protected void onPreExecute(){
         switch(demand){
             case "getVideos":
-                this.requete = "http://192.168.0.19:4040/rest/getVideos.view";
+                this.requete = "http://192.168.1.17:4040/rest/getVideos.view";
                 this.parametres = "u=admin&p=admin&v=1.12.0&c=myapp";
                 break;
             case "getVideo":
@@ -60,8 +60,6 @@ public class GetVideos extends AsyncTask<String, Void, String> {
 
         final StringBuilder output = new StringBuilder();
         try {
-
-            //final TextView outputView = (TextView) activity.findViewById(R.id.showOutput);
             URL url = new URL(requete);
 
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
@@ -76,32 +74,20 @@ public class GetVideos extends AsyncTask<String, Void, String> {
             dStream.close();
             //int responseCode = connection.getResponseCode();
 
-            //System.out.println("\nSending 'POST' request to URL : " + url);
-            //System.out.println("Post parameters : " + urlParameters);
-            //System.out.println("Response Code : " + responseCode);
-
-            //final StringBuilder output = new StringBuilder("Request URL " + url);
-
-            //output.append(System.getProperty("line.separator") + "Request Parameters " + urlParameters);
-            //output.append(System.getProperty("line.separator")  + "Response Code " + responseCode);
-            //output.append(System.getProperty("line.separator")  + "Type " + "POST");
             BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = "";
             StringBuilder responseOutput = new StringBuilder();
-            //System.out.println("output===============" + br);
             while((line = br.readLine()) != null ) {
                 responseOutput.append(line);
             }
             br.close();
 
-            //output.append(System.getProperty("line.separator") + "Response " + System.getProperty("line.separator") + System.getProperty("line.separator") + responseOutput.toString());
             output.append(responseOutput.toString());
 
             activity.runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
-                    //outputView.setText(output);
                     progress.dismiss();
                 }
             });

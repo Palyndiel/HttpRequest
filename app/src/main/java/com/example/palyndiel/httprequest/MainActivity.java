@@ -6,15 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -22,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Video> mListItems;
     private VideoAdapter mAdapter;
-    private TextView mSelectedTrackTitle;
     private String output;
 
     public void setOutput(String output) {
@@ -34,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mListItems = new ArrayList<Video>();
         try {
             sendPostRequest("getVideos", 0);
         } catch (ExecutionException e) {
@@ -45,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             mListItems = new XMLParser().Parser(output);
+            if (mListItems == null){
+                Video defau = new Video();
+                defau.setID(0);
+                defau.setTitle("Pas de video disponible");
+                mListItems.add(defau);
+            }
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -54,23 +55,35 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new VideoAdapter(this, mListItems);
         listView.setAdapter(mAdapter);
 
-        mSelectedTrackTitle = (TextView)findViewById(R.id.selected_video_title);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Video video = mListItems.get(position);
                 int num = video.getID();
 
-                String req = "http://192.168.0.19:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id="+num;
+                String req = String.valueOf(num);
 
-                /*mSelectedTrackTitle.setText(req);
                 Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
-                myIntent.putExtra("request", req);
-                startActivity(myIntent);*/
-                Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
-                myIntent.setData(Uri.parse(req));
-                startService(myIntent);
+                myIntent.putExtra("id", req);
+                startActivity(myIntent);
+                /*Intent myIntent = new Intent(Intent.ACTION_VIEW);
+                myIntent.setDataAndType(Uri.parse(req), "video/mp4");
+                // Always use string resources for UI text.
+                // This says something like "Share this photo with"
+                String title = "Selectionner un lecteur video";
+                // Create intent to show the chooser dialog
+                Intent chooser = Intent.createChooser(myIntent, title);
+
+                // Verify the original intent will resolve to at least one activity
+                if (myIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(chooser);
+                }*/
+                /*int vlcRequestCode = 42;
+                Uri uri = Uri.parse(req);
+                Intent vlcIntent = new Intent(Intent.ACTION_VIEW);
+                vlcIntent.setPackage("org.videolan.vlc");
+                vlcIntent.setDataAndTypeAndNormalize(uri, "video*//*");
+                startActivityForResult(vlcIntent, vlcRequestCode);*/
 
             }
         });
@@ -79,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
     public void sendPostRequest(String req, int num) throws ExecutionException, InterruptedException {
         output = new GetVideos(this, MainActivity.this, req, 0).execute().get();
         //Toast.makeText(MainActivity.this, output, Toast.LENGTH_LONG).show();
-        //mSelectedTrackTitle.setText(output);
     }
 
 }

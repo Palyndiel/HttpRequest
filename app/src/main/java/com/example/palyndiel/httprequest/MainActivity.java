@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         try {
-            sendPostRequest("getVideos", 0);
+            sendPostRequest();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -63,10 +63,10 @@ public class MainActivity extends AppCompatActivity {
 
                 String req = String.valueOf(num);
 
-                Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
+                /*Intent myIntent = new Intent(MainActivity.this, VideoViewActivity.class);
                 myIntent.putExtra("id", req);
-                startActivity(myIntent);
-                /*Intent myIntent = new Intent(Intent.ACTION_VIEW);
+                startActivity(myIntent);*/
+                Intent myIntent = new Intent(Intent.ACTION_VIEW);
                 myIntent.setDataAndType(Uri.parse(req), "video/mp4");
                 // Always use string resources for UI text.
                 // This says something like "Share this photo with"
@@ -77,20 +77,14 @@ public class MainActivity extends AppCompatActivity {
                 // Verify the original intent will resolve to at least one activity
                 if (myIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(chooser);
-                }*/
-                /*int vlcRequestCode = 42;
-                Uri uri = Uri.parse(req);
-                Intent vlcIntent = new Intent(Intent.ACTION_VIEW);
-                vlcIntent.setPackage("org.videolan.vlc");
-                vlcIntent.setDataAndTypeAndNormalize(uri, "video*//*");
-                startActivityForResult(vlcIntent, vlcRequestCode);*/
+                }
 
             }
         });
     }
 
-    public void sendPostRequest(String req, int num) throws ExecutionException, InterruptedException {
-        output = new GetVideos(this, MainActivity.this, req, 0).execute().get();
+    public void sendPostRequest() throws ExecutionException, InterruptedException {
+        output = new GetVideos(this, MainActivity.this).execute().get();
         //Toast.makeText(MainActivity.this, output, Toast.LENGTH_LONG).show();
     }
 

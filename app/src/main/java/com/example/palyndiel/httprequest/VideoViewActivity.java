@@ -21,7 +21,7 @@ public class VideoViewActivity extends Activity{
     // Insert your Video URL
 
     //String VideoURL = extras.getString("request");
-    String VideoURL = "http://192.168.1.17:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id=";
+    String VideoURL = "http://192.168.8.28:4040/rest/stream.view?u=admin&p=admin&v=1.12.0&c=myapp&id=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

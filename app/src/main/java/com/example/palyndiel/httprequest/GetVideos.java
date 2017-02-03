@@ -23,16 +23,12 @@ public class GetVideos extends AsyncTask<String, Void, String> {
     private final Activity activity;
     private String requete;
     private String parametres;
-    private int id;
-    private final String demand;
     private ProgressDialog progress;
 
-    public GetVideos(Context c, Activity a, String r, int i){
+    public GetVideos(Context c, Activity a){
 
         this.context = c;
         this.activity = a;
-        this.demand = r;
-        this.id = i;
         this.requete = "";
         this.parametres = "";
 //            this.error = status;
@@ -40,16 +36,8 @@ public class GetVideos extends AsyncTask<String, Void, String> {
     }
 
     protected void onPreExecute(){
-        switch(demand){
-            case "getVideos":
-                this.requete = "http://192.168.1.17:4040/rest/getVideos.view";
-                this.parametres = "u=admin&p=admin&v=1.12.0&c=myapp";
-                break;
-            case "getVideo":
-                this.requete = "http://192.168.0.19:4040/rest/stream.view";
-                this.parametres = "u=admin&p=admin&v=1.12.0&c=myapp&id="+id;
-                break;
-        }
+        this.requete = "http://192.168.8.28:4040/rest/getVideos.view";
+        this.parametres = "u=admin&p=admin&v=1.12.0&c=myapp";
         progress= new ProgressDialog(this.context);
         progress.setMessage("Loading");
         progress.show();
